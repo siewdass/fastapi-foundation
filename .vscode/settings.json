@@ -1,8 +1,8 @@
 {
   "editor.tabSize": 2,
+  "editor.insertSpaces": false,
   "editor.detectIndentation": false,
   "files.exclude": {
-    ".vscode": true,
     "**/__pycache__": true
   },
 }
