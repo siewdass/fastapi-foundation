@@ -58,11 +58,7 @@ class Router:
                                 raise HTTPException(status_code=422, detail=e.errors())
                         
                         logger.info(f'Request received with params {data}')
-                        
-                        if data:
-                            return await endpoint(data)
-                        else:
-                            return await endpoint(request)
+                        return await endpoint(data if data else request)
 
                     self.routes.append(
                         APIRoute(path=self.prefix + path, endpoint=logging, methods=[m.upper()], name=endpoint.__name__)
