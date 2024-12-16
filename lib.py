@@ -57,7 +57,7 @@ class Router:
                             except ValidationError as e:
                                 raise HTTPException(status_code=422, detail=e.errors())
                         
-                        logger.info(f'Request received at {self.prefix + path} with method {m}')
+                        logger.info(f'Request received with params {data}')
                         
                         if data:
                             return await endpoint(data)
@@ -65,7 +65,7 @@ class Router:
                             return await endpoint(request)
 
                     self.routes.append(
-                        APIRoute(path=self.prefix + path, endpoint=logging, methods=[m.upper()], name=endpoint.__name__,)
+                        APIRoute(path=self.prefix + path, endpoint=logging, methods=[m.upper()], name=endpoint.__name__)
                     )
 
     def register(self, app: FastAPI):
