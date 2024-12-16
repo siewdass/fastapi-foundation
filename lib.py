@@ -1,4 +1,4 @@
-from fastapi import HTTPException, Request, FastAPI
+from fastapi import HTTPException, Request, FastAPI, Depends
 from fastapi.routing import APIRoute
 from typing import Callable, Type, Optional
 from pydantic import BaseModel, ValidationError
@@ -19,7 +19,8 @@ logger.addHandler(handler)
 logger.setLevel(INFO)
 
 class Router:
-	__routes__ = []
+	__routes__: list = []
+	dependencies: list = []
 
 	def __init__(self):
 		methods = [ 'GET', 'POST', 'PUT', 'DELETE' ]
@@ -53,7 +54,13 @@ class Router:
 						return await endpoint(data if data else request)
 
 					self.__routes__.append(
-						APIRoute(path=self.prefix + path, endpoint=logging, methods=[m.upper()], name=endpoint.__name__)
+						APIRoute(
+							path=self.prefix + path,
+							endpoint=logging,
+							methods=[m.upper()],
+							name=endpoint.__name__,
+							dependencies=[Depends(dep) for dep in self.dependencies] if self.dependencies else []
+						)
 					)
 
 	def register(self, app: FastAPI):
