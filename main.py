@@ -1,16 +1,17 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from database import connect
-from util import load_modules
+from util import loadLibrary
+from beanie import Document
+from lib	import Router
 
 uri = 'mongodb://root:toor@192.168.0.100/?authSource=admin'
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-	m = load_modules()
-	db = await connect(uri=uri, database='dan', models=m['models'])
-	for router in m['routers']:
-			router().register(app)
+	db = await connect(uri=uri, database='dan', models=loadLibrary(Document))
+	for router in loadLibrary(Router):
+		router().register(app)
 	yield
 	db.close()
 
