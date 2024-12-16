@@ -48,7 +48,7 @@ class Router:
                             model = param.annotation
                             break
 
-                    async def logging(request: Request, path=path, m=m.upper(), endpoint=endpoint, model=model):
+                    async def logging(request: Request):
                         data = None
                         if model:
                             try:
