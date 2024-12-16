@@ -4,7 +4,9 @@ from os import path, getcwd, walk
 def loadLibrary(cls_type):
 	m = []
 	base_dir = getcwd()
-	for root, _, files in walk(base_dir):
+	ignore_dirs = ['__pycache__', '.vscode', '.venv']
+	for root, dirs, files in walk(base_dir):
+		dirs[:] = [d for d in dirs if d not in ignore_dirs]
 		py_files = [f for f in files if f.endswith('.py') and f != '__init__.py']
 
 		for py_file in py_files:
@@ -17,5 +19,5 @@ def loadLibrary(cls_type):
 						if obj not in m:
 							m.append(obj)
 			except Exception as e:
-				print(f"Error loading module {module_name} in {module_path}: {e}")
+				print(f"Error importing {module_name}: {e}")
 	return m

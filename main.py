@@ -4,6 +4,7 @@ from database import connect
 from util import loadLibrary
 from beanie import Document
 from lib	import Router
+
 from settings import MONGO_URI
 
 @asynccontextmanager
@@ -16,11 +17,12 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-from uvicorn import run
-
+#from uvicorn import run
 #run(app, host='0.0.0.0', port=8000)
+
 #deactivate
 #rm -rf .venv
 #python3 -m venv .venv
 #source .venv/bin/activate
-#pip install fastapi
+#pip install -r requirements.txt
+#uvicorn main:app --reload --port 8000 --host 0.0.0.0
