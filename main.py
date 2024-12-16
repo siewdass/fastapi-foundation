@@ -11,7 +11,6 @@ async def lifespan(app: FastAPI):
     m = load_modules()
     db = await connect(uri=uri, database='dan', models=m['models'])
     for router in m['routers']:
-        #app.include_router(router())
         router = router()
         router.register(app)
     yield

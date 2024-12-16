@@ -27,41 +27,47 @@ logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
 class Router:
-    methods = [ "GET", "POST", "PUT", "DELETE" ]
+    methods = [ 'GET', 'POST', 'PUT', 'DELETE' ]
     routes = []
 
     def __init__(self):
         for name, method in inspect.getmembers(self, predicate=inspect.ismethod):
             for m in self.methods:
                 if name.startswith(m.lower()):
+                    path = ''
+                    model: Optional[Type[BaseModel]] = None
+                    endpoint: Callable = method
+
+                    if name.upper() not in self.methods:
+                        path = f'/{name[len(m):]}'.lower()
+
                     signature = inspect.signature(method)
-                    model = None
 
                     for param in signature.parameters.values():
                         if isinstance(param.annotation, type) and issubclass(param.annotation, BaseModel):
                             model = param.annotation
                             break
-                    
-                    self.__middleware__(m, method, model)
 
-    def __middleware__(self, path: str, method: Callable, model: Optional[Type[BaseModel]] = None):
+                    async def logging(request: Request, path=path, m=m.upper(), endpoint=endpoint, model=model):
+                        data = None
+                        if model:
+                            try:
+                                body = await request.json()
+                                data = model(**body)
+                            except ValidationError as e:
+                                raise HTTPException(status_code=422, detail=e.errors())
+                        
+                        logger.info(f'Request received at {self.prefix + path} with method {m}')
+                        
+                        if data:
+                            return await endpoint(data)
+                        else:
+                            return await endpoint(request)
 
-        async def logging(request: Request):
-            if model:
-                try:
-                    body = await request.json()
-                    data = model(**body)
-                    logger.info(f"Request validated: {data}")
-                except ValidationError as e:
-                    raise HTTPException(status_code=422, detail=e.errors())
+                    self.routes.append(
+                        APIRoute(path=self.prefix + path, endpoint=logging, methods=[m.upper()], name=endpoint.__name__,)
+                    )
 
-            logger.info(f"Request received at { path } with method {path.upper()}")
-            return await method(data)
-
-        self.routes.append(
-            APIRoute(path=self.prefix + '', endpoint=logging, methods=[path.upper()], name=method.__name__,)
-        )
-
-    def register(self, app):
+    def register(self, app: FastAPI):
         for route in self.routes:
             app.router.routes.append(route)
