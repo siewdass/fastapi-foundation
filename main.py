@@ -1,5 +1,4 @@
 from fastapi import FastAPI
-from uvicorn import run
 from contextlib import asynccontextmanager
 from database import connect
 from util import load_modules
@@ -16,4 +15,6 @@ async def lifespan(app: FastAPI):
 	db.close()
 
 app = FastAPI(lifespan=lifespan)
+
+from uvicorn import run
 #run(app, host='0.0.0.0', port=8000)
