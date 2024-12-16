@@ -2,48 +2,42 @@ from fastapi import HTTPException, Request, FastAPI
 from fastapi.routing import APIRoute
 from typing import Callable, Type, Optional
 from pydantic import BaseModel, ValidationError
-import inspect
-import logging
+from inspect import getmembers, ismethod, signature
+from logging import getLogger, StreamHandler, INFO
 from colorlog import ColoredFormatter
 
-logger = logging.getLogger()
-handler = logging.StreamHandler()
+logger = getLogger()
+handler = StreamHandler()
 
 formatter = ColoredFormatter(
-    "%(log_color)s%(levelname)s%(reset)s:     %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
+    '%(log_color)s%(levelname)s%(reset)s:     %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S',
     reset=True,
-    log_colors={
-        "DEBUG": "cyan",
-        "INFO": "green",
-        "WARNING": "yellow",
-        "ERROR": "red",
-        "CRITICAL": "bold_red",
-    }
+    log_colors={ 'DEBUG': 'cyan', 'INFO': 'green', 'WARNING': 'yellow', 'ERROR': 'red', 'CRITICAL': 'bold_red' }
 )
 
 handler.setFormatter(formatter)
 logger.addHandler(handler)
-logger.setLevel(logging.INFO)
+logger.setLevel(INFO)
 
 class Router:
-    methods = [ 'GET', 'POST', 'PUT', 'DELETE' ]
-    routes = []
+    __routes__ = []
 
     def __init__(self):
-        for name, method in inspect.getmembers(self, predicate=inspect.ismethod):
-            for m in self.methods:
+        methods = [ 'GET', 'POST', 'PUT', 'DELETE' ]
+        for name, method in getmembers(self, predicate=ismethod):
+            for m in methods:
                 if name.startswith(m.lower()):
                     path = ''
                     model: Optional[Type[BaseModel]] = None
                     endpoint: Callable = method
 
-                    if name.upper() not in self.methods:
+                    if name.upper() not in methods:
                         path = f'/{name[len(m):]}'.lower()
 
-                    signature = inspect.signature(method)
+                    parameters = signature(method).parameters
 
-                    for param in signature.parameters.values():
+                    for param in parameters.values():
                         if isinstance(param.annotation, type) and issubclass(param.annotation, BaseModel):
                             model = param.annotation
                             break
@@ -60,10 +54,10 @@ class Router:
                         logger.info(f'Request received with parameters {data}')
                         return await endpoint(data if data else request)
 
-                    self.routes.append(
+                    self.__routes__.append(
                         APIRoute(path=self.prefix + path, endpoint=logging, methods=[m.upper()], name=endpoint.__name__)
                     )
 
     def register(self, app: FastAPI):
-        for route in self.routes:
+        for route in self.__routes__:
             app.router.routes.append(route)
