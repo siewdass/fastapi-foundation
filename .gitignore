@@ -1,1 +1,9 @@
-__pycache__
+# Virtual enviroments assets
+.venv/
+
+# Cache assets
+.pytest_cache/
+__pycache__/
+
+# File extensions
+*.db

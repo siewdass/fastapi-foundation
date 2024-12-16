@@ -17,4 +17,10 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 from uvicorn import run
+
 #run(app, host='0.0.0.0', port=8000)
+#deactivate
+#rm -rf .venv
+#python3 -m venv .venv
+#source .venv/bin/activate
+#pip install fastapi
