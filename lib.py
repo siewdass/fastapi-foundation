@@ -57,7 +57,7 @@ class Router:
                             except ValidationError as e:
                                 raise HTTPException(status_code=422, detail=e.errors())
                         
-                        logger.info(f'Request received with params {data}')
+                        logger.info(f'Request received with parameters {data}')
                         return await endpoint(data if data else request)
 
                     self.routes.append(
