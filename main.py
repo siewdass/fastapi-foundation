@@ -4,12 +4,11 @@ from database import connect
 from util import loadLibrary
 from beanie import Document
 from lib	import Router
-
-uri = 'mongodb://root:toor@192.168.0.100/?authSource=admin'
+from settings import MONGO_URI
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-	db = await connect(uri=uri, database='dan', models=loadLibrary(Document))
+	db = await connect(uri=MONGO_URI, database='dan', models=loadLibrary(Document))
 	for router in loadLibrary(Router):
 		router().register(app)
 	yield

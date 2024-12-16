@@ -17,5 +17,5 @@ def loadLibrary(cls_type):
 						if obj not in m:
 							m.append(obj)
 			except Exception as e:
-					print(f"Error loading module {module_name} in {module_path}: {e}")
+				print(f"Error loading module {module_name} in {module_path}: {e}")
 	return m
