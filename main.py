@@ -8,13 +8,12 @@ uri = 'mongodb://root:toor@192.168.0.100/?authSource=admin'
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    m = load_modules()
-    db = await connect(uri=uri, database='dan', models=m['models'])
-    for router in m['routers']:
-        router = router()
-        router.register(app)
-    yield
-    db.close()
+  m = load_modules()
+  db = await connect(uri=uri, database='dan', models=m['models'])
+  for router in m['routers']:
+      router().register(app)
+  yield
+  db.close()
 
 app = FastAPI(lifespan=lifespan)
 #run(app, host='0.0.0.0', port=8000)
