@@ -12,4 +12,4 @@ class AnimalRouter(Router):
 	async def post(self, request: Request):
 		animal = Animal(name=request.name, sound=request.sound)
 		await animal.insert()
-		return Response(message = 'tu animal se creo!')
+		return Response(message = 'created!')
