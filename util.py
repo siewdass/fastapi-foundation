@@ -27,4 +27,5 @@ def loadLibrary(cls_type):
 def loadRouters(app: FastAPI):
 	app.add_exception_handler(HttpException, httpException)
 	for router in loadLibrary(Router):
-		router().register(app)
+		for route in router().__routes__:
+			app.router.routes.append(route)
