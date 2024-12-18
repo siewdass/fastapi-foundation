@@ -6,7 +6,5 @@
   "files.exclude": {
     "**/__pycache__": true,
 		"**/.venv": true
-  },
-	"python.languageServer": "Pylance",
-	"python.analysis.extraPaths": [ ".venv/lib/python3.10/site-packages" ]
+  }
 }

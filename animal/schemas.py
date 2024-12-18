@@ -1,8 +1,5 @@
 from pydantic import BaseModel
 
-class Request(BaseModel):
+class Body(BaseModel):
 	name: str
 	sound: str
-
-class Response(BaseModel):
-	message: str

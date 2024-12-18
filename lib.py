@@ -1,24 +1,49 @@
-from fastapi import HTTPException, Request, FastAPI, Depends
+from fastapi import Request, FastAPI, Depends, HTTPException
 from fastapi.routing import APIRoute
+from fastapi.responses import JSONResponse
 from typing import Callable, Type, Optional
 from pydantic import BaseModel, ValidationError
 from inspect import getmembers, ismethod, signature
-from logging import getLogger, StreamHandler, INFO
-from colorlog import ColoredFormatter
+from logging import getLogger
 
-logger = getLogger()
-handler = StreamHandler()
+logger = getLogger('uvicorn')
 
-formatter = ColoredFormatter(
-	'%(log_color)s%(levelname)s%(reset)s:     %(message)s',
-	log_colors={ 'DEBUG': 'cyan', 'INFO': 'green', 'WARNING': 'yellow', 'ERROR': 'red', 'CRITICAL': 'bold_red' }
-)
+class HttpException(HTTPException):
+	def __init__(self, status: int, message: str, *args, **kwargs):
+		kwargs['status_code'] = status
+		kwargs['detail'] = message
+		logger.warning(f'HTTP Exception: {message}')     
+		super().__init__(*args, **kwargs)
 
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-logger.setLevel(INFO)
+	Found: int = 302
+	BadRequest: int = 400
+	Unauthorized: int = 401
+	Forbidden: int = 403
+	NotFound: int = 404
+	NotAcceptable: int = 406
+	Conflict: int = 409
+	UnprocessableEntity: int = 422
+	TooManyRequests: int = 429
+	ServerError: int = 500
+	NotImplemented: int = 501
+
+async def httpException(_, e: HttpException):
+	return JSONResponse(status_code=e.status_code, content={ 'status_code': e.status_code, 'message': e.detail })
+
+class HttpResponse(JSONResponse):
+	def __init__(self, status: int, message: str, *args, **kwargs):
+		kwargs['status_code'] = status
+		kwargs['content'] = { 'status_code': status, 'message': message }
+		logger.info(f'HTTP response {message}')
+		super().__init__(*args, **kwargs)
+
+	Ok: int = 200
+	Created: int = 201
+	Accepted: int = 202
+	NoContent: int = 204
 
 class Router:
+	prefix: str = ''
 	__routes__: list = []
 	dependencies: list = []
 
@@ -48,9 +73,11 @@ class Router:
 								body = await request.json()
 								data = model(**body)
 							except ValidationError as e:
-								raise HTTPException(status_code=422, detail=e.errors())
+								error_messages = [f"Missing field: {err['loc'][0]}, Error: {err['msg']}" for err in e.errors()]
+								error_message = " | ".join(error_messages)
+								raise HttpException(status=HttpException.UnprocessableEntity, message=error_message)
 					
-						logger.info(f'Request received with parameters {data}')
+						logger.info(f'HTTP Request {data}')
 						return await endpoint(data if data else request)
 
 					self.__routes__.append(

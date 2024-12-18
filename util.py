@@ -1,5 +1,7 @@
 from importlib import import_module
 from os import path, getcwd, walk
+from lib import Router, HttpException, httpException
+from fastapi import FastAPI
 
 def loadLibrary(cls_type):
 	m = []
@@ -21,3 +23,8 @@ def loadLibrary(cls_type):
 			except Exception as e:
 				print(f"Error importing {module_name}: {e}")
 	return m
+
+def loadRouters(app: FastAPI):
+	app.add_exception_handler(HttpException, httpException)
+	for router in loadLibrary(Router):
+		router().register(app)
