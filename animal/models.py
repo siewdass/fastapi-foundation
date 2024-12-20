@@ -1,5 +1,5 @@
-from beanie import Document
+from library import Model
 
-class Animal(Document):
+class Animal(Model):
 	name: str
 	sound: str

@@ -1,5 +1,5 @@
-from pydantic import BaseModel
+from library import Schema
 
-class Body(BaseModel):
+class Body(Schema):
 	name: str
 	sound: str

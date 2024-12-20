@@ -60,7 +60,3 @@ class Router:
 							dependencies=[Depends(dep) for dep in self.dependencies] if self.dependencies else []
 						)
 					)
-
-	def register(self, app: FastAPI):
-		for route in self.__routes__:
-			app.router.routes.append(route)
