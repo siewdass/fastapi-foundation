@@ -17,7 +17,7 @@ class UserRouter(Router):
 			await user.insert()
 			return HttpResponse(status=HttpResponse.Ok, message='user created!')
 		except HttpException as error:
-			return error
+			raise error
 		except Exception as error:
 			return HttpException(status=HttpException.ServerError, message='unknown error')
 

@@ -1,10 +1,8 @@
-from fastapi import Request, Depends, FastAPI
+from fastapi import Request, Depends
 from fastapi.routing import APIRoute
-from fastapi.responses import JSONResponse
 from typing import Callable, Type, Optional
 from pydantic import BaseModel, ValidationError
 from inspect import getmembers, ismethod, signature
-
 from logging import getLogger
 from .responses import HttpException
 
@@ -35,21 +33,18 @@ class Router:
 							break
 
 					async def logging(request: Request):
-						data = None
-						if model:
-							try:
-								body = await request.json()
-								data = model(**body)
-							except ValidationError as e:
-								error_messages = [f"Missing field: {err['loc'][0]}, Error: {err['msg']}" for err in e.errors()]
-								error_message = " | ".join(error_messages)
-								raise HttpException(status=HttpException.UnprocessableEntity, message=error_message)
-					
-						logger.info(f'HTTP Request {data}')
-						response = await endpoint(data if data else request)
-						if isinstance(response, HttpException):
-							return JSONResponse(status_code=response.status_code, content={ 'status_code': response.status_code, 'message': response.detail })
-						return response
+							data = None
+							if model:
+								try:
+									body = await request.json()
+									data = model(**body)
+								except ValidationError as e:
+									error_messages = [f"Missing field: {err['loc'][0]}, Error: {err['msg']}" for err in e.errors()]
+									error_message = " | ".join(error_messages)
+									raise HttpException(status=HttpException.UnprocessableEntity, message=error_message)
+						
+							logger.info(f'HTTP Request {data}')
+							return await endpoint(data if data else request)
 
 					self.__routes__.append(
 						APIRoute(

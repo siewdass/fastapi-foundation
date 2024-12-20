@@ -1,11 +1,14 @@
 from fastapi import FastAPI
 from typing import AsyncGenerator
 from .router import Router
+from .responses import HttpException, httpException
 from .loadLibrary import loadLibrary
 
 class API(FastAPI):
+
 	def __init__(self, **kwargs):
 		super().__init__(lifespan=self.lifespan, **kwargs)
+		self.add_exception_handler(HttpException, httpException)
 
 	async def onBoot(self):
 		yield

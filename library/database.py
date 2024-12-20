@@ -11,7 +11,7 @@ class MongoDB:
 		database = self.client.get_default_database()
 		await init_beanie(database=database, document_models=loadLibrary(Model))
 
-	def disconnect(self):
+	async def disconnect(self):
 		if self.client is not None:
 			self.client.close()
 

@@ -1,4 +1,4 @@
-from fastapi import HTTPException
+from fastapi import HTTPException, Request
 from fastapi.responses import JSONResponse
 from logging import getLogger
 
@@ -22,6 +22,9 @@ class HttpException(HTTPException):
 	TooManyRequests: int = 429
 	ServerError: int = 500
 	NotImplemented: int = 501
+
+def httpException(_: Request, exc: HttpException):
+	return JSONResponse(status_code=exc.status_code, content={"message": exc.detail})
 
 class HttpResponse(JSONResponse):
 	def __init__(self, status: int, message: str, *args, **kwargs):

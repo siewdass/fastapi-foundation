@@ -7,7 +7,7 @@ class MyApp(API):
 		database = Database()
 		await database.connect()
 		yield
-		database.disconnect()
+		await database.disconnect()
 
 app = MyApp()
 

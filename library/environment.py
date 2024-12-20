@@ -4,13 +4,11 @@ from inspect import get_annotations
 class Environment:
 	def __init__(self, DOTENV: str = '.env'):
 		repo = RepositoryEnv(DOTENV)
-		data = repo.data
 		annotations = get_annotations(self.__class__)
 
-		data = repo.data
 		for key, type in annotations.items():
-			if key in data:
-				value = data[key]
+			if key in repo.data:
+				value = repo.data[key]
 				try:
 					value = type(value)
 				except (ValueError, TypeError):
