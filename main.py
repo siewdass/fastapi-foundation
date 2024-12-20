@@ -1,20 +1,24 @@
-from fastapi import FastAPI
-from contextlib import asynccontextmanager
-from database import connect
-from util import loadLibrary, loadRouters
+from database import connect, disconnect
 from beanie import Document
-from settings import MONGO_URI
+from settings import Settings
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-	models = loadLibrary(Document)
-	db = await connect(uri=MONGO_URI, database='dan', models=models)
-	yield
-	db.close()
+from library import API, Router, loadLibrary
 
-app = FastAPI(lifespan=lifespan)
-loadRouters(app)
+class MyApp(API):
+	settings = Settings()
 
+	async def onBoot(self):
+		await connect(
+			uri=self.settings.MONGO_URI,
+			database=self.settings.DATABASE_NAME,
+			models=loadLibrary(Document)
+		)
+		for router in loadLibrary(Router):
+			router().register(app)
+		yield
+		await disconnect()
+
+app = MyApp()
 #from uvicorn import run
 #run("main.app:app", host="0.0.0.0", port=8000, reload=True)
 #deactivate

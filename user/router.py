@@ -1,9 +1,8 @@
-from lib import Router
 from .schemas import UserSchema
 from .models import User
-from fastapi.responses import JSONResponse
-from fastapi import HTTPException
 from bcrypt import checkpw, hashpw, gensalt 
+
+from library import Router, HttpException, HttpResponse
 
 class UserRouter(Router):
 	prefix = '/user' 
@@ -12,17 +11,15 @@ class UserRouter(Router):
 		try:
 			user = await User.find_one(User.email==body.email)
 			if user is not None:
-				raise HTTPException(status_code=400, detail={'message': 'user already exists'})
+				raise HttpException(status=HttpException.BadRequest, message='user already exists')
 			password = hashpw(body.password.encode('utf-8'), gensalt())
 			user = User(email=body.email, password=password)
 			await user.insert()
-			return JSONResponse(status_code=200, content={'message': 'user created!'})
-		except HTTPException as error:
+			return HttpResponse(status=HttpResponse.Ok, message='user created!')
+		except HttpException as error:
 			return error
 		except Exception as error:
-			return HTTPException(status_code=500, detail={'message': 'unknown error'})
-
-
+			return HttpException(status=HttpException.ServerError, message='unknown error')
 
 #hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 #if bcrypt.checkpw(password.encode('utf-8'), hashed):

@@ -1,4 +1,4 @@
-from lib import Router, HttpResponse, HttpException
+from library import Router, HttpException, HttpResponse
 from .schemas import Body
 from .models import Animal
 

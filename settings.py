@@ -1,4 +1,6 @@
-from decouple import config
+from library import Environment
 
-MONGO_URI = config('MONGO_URI', default='', cast=str)
-SECRET_KEY = config('SECRET_KEY', default='', cast=str)
+class Settings(Environment):
+	MONGO_URI: str 
+	SECRET_KEY: str
+	DATABASE_NAME: str

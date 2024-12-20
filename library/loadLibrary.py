@@ -1,12 +1,10 @@
 from importlib import import_module
 from os import path, getcwd, walk
-from lib import Router, HttpException, httpException
-from fastapi import FastAPI
 
 def loadLibrary(cls_type):
 	m = []
 	base_dir = getcwd()
-	ignore_dirs = ['__pycache__', '.vscode', '.venv']
+	ignore_dirs = ['__pycache__', '.vscode', '.venv', '.git']
 	for root, dirs, files in walk(base_dir):
 		dirs[:] = [d for d in dirs if d not in ignore_dirs]
 		py_files = [f for f in files if f.endswith('.py') and f != '__init__.py']
@@ -23,9 +21,3 @@ def loadLibrary(cls_type):
 			except Exception as e:
 				print(f"Error importing {module_name}: {e}")
 	return m
-
-def loadRouters(app: FastAPI):
-	app.add_exception_handler(HttpException, httpException)
-	for router in loadLibrary(Router):
-		for route in router().__routes__:
-			app.router.routes.append(route)

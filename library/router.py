@@ -1,51 +1,19 @@
-from fastapi import Request, FastAPI, Depends, HTTPException
+from fastapi import Request, Depends, FastAPI
 from fastapi.routing import APIRoute
 from fastapi.responses import JSONResponse
 from typing import Callable, Type, Optional
 from pydantic import BaseModel, ValidationError
 from inspect import getmembers, ismethod, signature
+
 from logging import getLogger
+from .responses import HttpException
 
 logger = getLogger('uvicorn')
 
-class HttpException(HTTPException):
-	def __init__(self, status: int, message: str, *args, **kwargs):
-		kwargs['status_code'] = status
-		kwargs['detail'] = message
-		logger.warning(f'HTTP Exception: {message}')     
-		super().__init__(*args, **kwargs)
-
-	Found: int = 302
-	BadRequest: int = 400
-	Unauthorized: int = 401
-	Forbidden: int = 403
-	NotFound: int = 404
-	NotAcceptable: int = 406
-	Conflict: int = 409
-	UnprocessableEntity: int = 422
-	TooManyRequests: int = 429
-	ServerError: int = 500
-	NotImplemented: int = 501
-
-async def httpException(_, e: HttpException):
-	return JSONResponse(status_code=e.status_code, content={ 'status_code': e.status_code, 'message': e.detail })
-
-class HttpResponse(JSONResponse):
-	def __init__(self, status: int, message: str, *args, **kwargs):
-		kwargs['status_code'] = status
-		kwargs['content'] = { 'status_code': status, 'message': message }
-		logger.info(f'HTTP response {message}')
-		super().__init__(*args, **kwargs)
-
-	Ok: int = 200
-	Created: int = 201
-	Accepted: int = 202
-	NoContent: int = 204
-
 class Router:
 	prefix: str = ''
-	__routes__: list = []
 	dependencies: list = []
+	__routes__: list = []
 
 	def __init__(self):
 		methods = [ 'GET', 'POST', 'PUT', 'DELETE' ]
@@ -78,7 +46,10 @@ class Router:
 								raise HttpException(status=HttpException.UnprocessableEntity, message=error_message)
 					
 						logger.info(f'HTTP Request {data}')
-						return await endpoint(data if data else request)
+						response = await endpoint(data if data else request)
+						if isinstance(response, HttpException):
+							return JSONResponse(status_code=response.status_code, content={ 'status_code': response.status_code, 'message': response.detail })
+						return response
 
 					self.__routes__.append(
 						APIRoute(
@@ -89,3 +60,7 @@ class Router:
 							dependencies=[Depends(dep) for dep in self.dependencies] if self.dependencies else []
 						)
 					)
+
+	def register(self, app: FastAPI):
+		for route in self.__routes__:
+			app.router.routes.append(route)
