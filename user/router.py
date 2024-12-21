@@ -21,6 +21,17 @@ class UserRouter(Router):
 		except Exception as error:
 			return HttpException(status=HttpException.ServerError, message='unknown error')
 
+	async def postSignIn(self, body: UserSchema):
+		try:
+			user = await User.find_one(User.email==body.email)
+			return HttpResponse(status=HttpResponse.Ok, message='Successful login!')
+		except HttpException as error:
+			raise error
+		except Exception as error:
+			return HttpException(status=HttpException.ServerError, message='unknow error')	
+
+
+
 #hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 #if bcrypt.checkpw(password.encode('utf-8'), hashed):
 #import jwt
