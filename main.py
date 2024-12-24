@@ -14,6 +14,7 @@ app = MyApp()
 #deactivate
 #rm -rf .venv
 #python3 -m venv .venv
-#source .venv/bin/activate
+#source .venv/bin/activatefile:///home/sam/main.js
+
 #pip install -r requirements.txt
 #uvicorn main:app --reload --port 8000 --host 0.0.0.0

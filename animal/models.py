@@ -1,5 +1,5 @@
-from library import Model
+from library import MongoModel
 
-class Animal(Model):
+class Animal(MongoModel):
 	name: str
 	sound: str

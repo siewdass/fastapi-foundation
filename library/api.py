@@ -1,19 +1,32 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+from fastapi.middleware import Middleware
+from starlette.middleware.base import BaseHTTPMiddleware
 from typing import AsyncGenerator
 from .router import Router
 from .responses import HttpException, httpException
-from .loadLibrary import loadLibrary
+from .util import loadLibrary
+
+from starlette.middleware.base import BaseHTTPMiddleware
+
+class Middleware(BaseHTTPMiddleware):
+	async def dispatch(self, request: Request, next):
+		try:
+			return await next(request)
+		except Exception as e:
+			return JSONResponse(status_code=500, content={'error': e.__class__.__name__,  'messages': e.args })
 
 class API(FastAPI):
 
 	def __init__(self, **kwargs):
-		super().__init__(lifespan=self.lifespan, **kwargs)
+		super().__init__(lifespan=self.__lifespan__, **kwargs)
 		self.add_exception_handler(HttpException, httpException)
+		self.add_middleware(Middleware)
 
 	async def onBoot(self):
 		yield
 
-	async def lifespan(self, _) -> AsyncGenerator:
+	async def __lifespan__(self, _) -> AsyncGenerator:
 		for router in loadLibrary(Router):
 			for route in router().__routes__:
 				self.router.routes.append(route)

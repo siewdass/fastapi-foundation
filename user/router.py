@@ -8,18 +8,18 @@ class UserRouter(Router):
 	prefix = '/user' 
 
 	async def postSignUp(self, body: UserSchema):
-		try:
+		#try:
 			user = await User.find_one(User.email==body.email)
 			if user is not None:
-				raise HttpException(status=HttpException.BadRequest, message='user already exists')
+				raise HttpException(status=HttpException.BadRequest, message='user already exists', aa=1)
 			password = hashpw(body.password.encode('utf-8'), gensalt())
 			user = User(email=body.email, password=password)
 			await user.insert()
 			return HttpResponse(status=HttpResponse.Ok, message='user created!')
-		except HttpException as error:
-			raise error
-		except Exception as error:
-			return HttpException(status=HttpException.ServerError, message='unknown error')
+		#except HttpException as error:
+		#	raise error
+		#except Exception as error:
+		#	return HttpException(status=HttpException.ServerError, message='unknown error')
 
 #hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 #if bcrypt.checkpw(password.encode('utf-8'), hashed):

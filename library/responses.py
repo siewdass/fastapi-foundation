@@ -24,12 +24,12 @@ class HttpException(HTTPException):
 	NotImplemented: int = 501
 
 def httpException(_: Request, exc: HttpException):
-	return JSONResponse(status_code=exc.status_code, content={"message": exc.detail})
+	return JSONResponse(status_code=exc.status_code, content={ 'message': exc.detail })
 
 class HttpResponse(JSONResponse):
 	def __init__(self, status: int, message: str, *args, **kwargs):
 		kwargs['status_code'] = status
-		kwargs['content'] = { 'status_code': status, 'message': message }
+		kwargs['content'] = { 'message': message }
 		logger.info(f'HTTP response {message}')
 		super().__init__(*args, **kwargs)
 

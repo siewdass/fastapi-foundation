@@ -1,6 +1,6 @@
 from motor.motor_asyncio import AsyncIOMotorClient
 from beanie import init_beanie, Document
-from .loadLibrary import loadLibrary
+from .util import loadLibrary
 
 class MongoDB:
 	URI: str = None
@@ -9,11 +9,11 @@ class MongoDB:
 	async def connect(self):
 		self.client = AsyncIOMotorClient(self.URI)
 		database = self.client.get_default_database()
-		await init_beanie(database=database, document_models=loadLibrary(Model))
+		await init_beanie(database=database, document_models=loadLibrary(MongoModel))
 
 	async def disconnect(self):
 		if self.client is not None:
 			self.client.close()
 
-class Model(Document):
+class MongoModel(Document):
 	pass

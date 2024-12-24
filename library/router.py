@@ -33,18 +33,18 @@ class Router:
 							break
 
 					async def logging(request: Request):
-							data = None
-							if model:
-								try:
-									body = await request.json()
-									data = model(**body)
-								except ValidationError as e:
-									error_messages = [f"Missing field: {err['loc'][0]}, Error: {err['msg']}" for err in e.errors()]
-									error_message = " | ".join(error_messages)
-									raise HttpException(status=HttpException.UnprocessableEntity, message=error_message)
-						
-							logger.info(f'HTTP Request {data}')
-							return await endpoint(data if data else request)
+						data = None
+						if model:
+							try:
+								body = await request.json()
+								data = model(**body)
+							except ValidationError as e:
+								error_messages = [f"Missing field: {err['loc'][0]}, Error: {err['msg']}" for err in e.errors()]
+								error_message = " | ".join(error_messages)
+								raise HttpException(status=HttpException.UnprocessableEntity, message=error_message)
+					
+						logger.info(f'HTTP Request {data}')
+						return await endpoint(data if data else request)
 
 					self.__routes__.append(
 						APIRoute(

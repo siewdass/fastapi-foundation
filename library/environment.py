@@ -12,5 +12,5 @@ class Environment:
 				try:
 					value = type(value)
 				except (ValueError, TypeError):
-					raise TypeError(f"La variable '{key}' no cumple con el tipo esperado '{type.__name__}'.")
+					raise TypeError(f"can't convert '{value}' to '{key}' type '{type.__name__}'.")
 				setattr(self, key, value)

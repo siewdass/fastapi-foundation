@@ -1,4 +1,7 @@
 from library import MongoDB
+from settings import Settings
+
+settings = Settings()
 
 class Database(MongoDB):
-	URI: str = 'mongodb://root:toor@siewdass.ddns.net:27017/dan?authSource=admin'
+	URI: str = settings.MONGO_URI
