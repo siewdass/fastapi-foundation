@@ -3,7 +3,7 @@ from .models import User
 from bcrypt import checkpw, hashpw, gensalt 
 from jwt import encode, decode
 from library import Router, HttpException, HttpResponse
-from settins import Settings
+from settings import Settings
 
 settings = Settings()
 

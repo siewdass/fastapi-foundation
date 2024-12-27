@@ -6,15 +6,17 @@ from typing import AsyncGenerator
 from .router import Router
 from .responses import HttpException, httpException
 from .util import loadLibrary
+from logging import getLogger
 
-from starlette.middleware.base import BaseHTTPMiddleware
+logger = getLogger('uvicorn')
 
 class Middleware(BaseHTTPMiddleware):
 	async def dispatch(self, request: Request, next):
 		try:
 			return await next(request)
 		except Exception as e:
-			return JSONResponse(status_code=500, content={'error': e.__class__.__name__,  'messages': e.args })
+			logger.error(f'Exception: {e.args}')
+			return JSONResponse(status_code=500, content={ 'message': e.args })
 
 class API(FastAPI):
 
