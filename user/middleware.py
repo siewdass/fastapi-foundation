@@ -1,7 +1,7 @@
 from library import Middleware, Request, Callable, HttpException
 from jwt import decode
 from settings import Settings
-from user.models import User
+from user.model import User
 
 settings = Settings()
 

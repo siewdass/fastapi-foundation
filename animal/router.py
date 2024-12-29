@@ -1,6 +1,6 @@
 from library import Router, HttpException, HttpResponse
-from .schemas import Body
-from .models import Animal
+from .schema import Body
+from .model import Animal
 
 class AnimalRouter(Router):
 	prefix: str = '/animal'

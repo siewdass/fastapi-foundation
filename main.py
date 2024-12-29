@@ -9,7 +9,6 @@ class MyApp(API):
 		yield
 		await database.disconnect()
 
-
 app = MyApp()
 
 #deactivate

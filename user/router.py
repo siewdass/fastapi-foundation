@@ -1,5 +1,5 @@
-from user.schemas import UserSchema
-from user.models import User
+from user.schema import UserSchema
+from user.model import User
 from bcrypt import checkpw, hashpw, gensalt 
 from jwt import encode
 from library import Router, HttpException, HttpResponse
