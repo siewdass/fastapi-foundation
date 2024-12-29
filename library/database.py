@@ -7,6 +7,9 @@ class MongoDB:
 	URI: str = None
 	client: AsyncIOMotorClient = None
 
+	def __init__(self, URI):
+		self.URI = URI
+
 	async def connect(self):
 		self.client = AsyncIOMotorClient(self.URI)
 		database = self.client.get_default_database()

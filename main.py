@@ -1,13 +1,15 @@
-from database import Database
-from library import API
+from settings import Settings
+from library import API, MongoDB
+
+settings = Settings()
 
 class MyApp(API):
 
 	async def onBoot(self):
-		database = Database()
-		await database.connect()
+		db = MongoDB(settings.MONGO_URI)
+		await db.connect()
 		yield
-		await database.disconnect()
+		await db.disconnect()
 
 app = MyApp()
 
