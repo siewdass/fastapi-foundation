@@ -32,26 +32,27 @@ class Router:
 							model = param.annotation
 							break
 
-					async def logging(request: Request):
-						data = None
-						if model:
-							try:
-								body = await request.json()
-								data = model(**body)
-							except ValidationError as e:
-								error_messages = [f"Missing field: {err['loc'][0]}, Error: {err['msg']}" for err in e.errors()]
-								error_message = " | ".join(error_messages)
-								raise HttpException(status=HttpException.UnprocessableEntity, message=error_message)
-					
-						logger.info(f'HTTP Request {data}')
-						return await endpoint(data if data else request)
+					def create(endpoint: Callable, method: str, path: str, model: Optional[Type[BaseModel]]):
+						async def logging(request: Request):
+							data = None
+							if model:
+								try:
+									body = await request.json()
+									data = model(**body)
+								except ValidationError as e:
+									error_messages = [f"Missing field: {err['loc'][0]}, Error: {err['msg']}" for err in e.errors()]
+									error_message = " | ".join(error_messages)
+									raise HttpException(status=HttpException.UnprocessableEntity, message=error_message)
+						
+							logger.info(f'HTTP Request {data}')
+							return await endpoint(data if data else request)
 
-					self.__routes__.append(
-						APIRoute(
+						return APIRoute(
 							path=self.prefix + path,
 							endpoint=logging,
-							methods=[m.upper()],
+							methods=[method.upper()],
 							name=endpoint.__name__,
 							dependencies=[Depends(dep) for dep in self.dependencies] if self.dependencies else []
 						)
-					)
+
+					self.__routes__.append(create(endpoint, m, path, model))

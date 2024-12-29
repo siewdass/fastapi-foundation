@@ -8,5 +8,5 @@ class AnimalRouter(Router):
 	async def post(self, body: Body):
 		animal = Animal(name=body.name, sound=body.sound)
 		await animal.insert()
-		raise HttpException(status=HttpException.BadRequest, message='error!')
+		#raise HttpException(status=HttpException.BadRequest, message='error!')
 		return HttpResponse(status=HttpResponse.Ok, message='created!')
