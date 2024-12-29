@@ -8,7 +8,7 @@ from settings import Settings
 settings = Settings()
 
 class UserRouter(Router):
-	prefix = '/user' 
+	prefix = '/user'
 
 	async def postSignUp(self, body: UserSchema):
 		user = await User.find_one(User.email==body.email)
