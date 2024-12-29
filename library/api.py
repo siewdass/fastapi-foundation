@@ -1,13 +1,10 @@
-from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
-from starlette.middleware.base import BaseHTTPMiddleware
+from fastapi import FastAPI
 from typing import AsyncGenerator
 from .router import Router
 from .responses import HttpException, httpException
 from fastapi.middleware.cors import CORSMiddleware
 from .util import loadLibrary
 from logging import getLogger
-from typing import Callable
 from .middleware import Middleware
 
 logger = getLogger('uvicorn')
