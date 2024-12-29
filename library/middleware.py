@@ -5,7 +5,6 @@ from typing import Callable
 class Middleware(BaseHTTPMiddleware):
 
 	async def onRequest(self, request: Request, next: Callable):
-		print('ssss')
 		return await next(request)
 
 	async def dispatch(self, request: Request, next: Callable):
